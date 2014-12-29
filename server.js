@@ -3,7 +3,12 @@ var app = express();
 
 app.get('/sasha/:anyparam', function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.send({response: req.params.anyparam});
+  
+  res.type('application/json');
+  var parameterValue = req.params.anyparam,
+      jsonResponse = new Object();
+  jsonResponse.response = parameterValue;
+  res.json(jsonResponse);
 })
 
 var server = app.listen(3000, function () {
