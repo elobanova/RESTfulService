@@ -1,0 +1,23 @@
+{
+  "name": "RESTfulService",
+  "version": "1.0.0",
+  "description": "",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elobanova/RESTfulService.git"
+  },
+  "author": "elobanova",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elobanova/RESTfulService/issues"
+  },
+  "homepage": "https://github.com/elobanova/RESTfulService",
+  "dependencies": {
+    "express": "^4.10.6"
+  }
+}
