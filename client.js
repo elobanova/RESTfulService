@@ -1,5 +1,5 @@
 window.onload = function () {
-	var sendButton = document.getElementById("send_button");
+	var sendButton = document.getElementById("login_button");
 	sendButton.onclick = requestFromServer;
 }
 
@@ -18,10 +18,16 @@ function requestFromServer() {
 		alert("I received the following object from the server: " + resp);
 	}
 
-	var customUrl = 'http://localhost:3000/users/',
-	paramInput = document.getElementById("param_input");
-	req.open("GET", customUrl + paramInput.value, true);
-	req.send();
+	var customUrl = 'http://localhost:3000/login/';
+	req.open("POST", customUrl, true);
+	
+	var data = new FormData();
+	var emailField = document.getElementById("email_field");
+	var passwordField = document.getElementById("password_field");
+	data.append('email', emailField.value);
+	data.append('password', passwordField.value);
+	
+	req.send(data);
 }
 
 function createRequest() {

@@ -1,12 +1,39 @@
-var express = require('express');
-var morgan = require('morgan');
-var bodyParser = require('body-parser');
-var config = require('./libs/config');
-var UsersModel = require('./libs/mongoose').UsersModel;
-var app = express();
+var express = require('express'),
+	morgan = require('morgan'),
+	bodyParser = require('body-parser'),
+	config = require('./libs/config'),
+	UsersModel = require('./libs/mongoose').UsersModel,
+	passport = require('passport'),
+	LocalStrategy = require('passport-local').Strategy,
+	app = express();
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
+
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+  },
+  function(username, password, done) {
+  alert('in here!');
+    UsersModel.findOne({ username: username }, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (!user.validPassword(password)) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+    });
+  }
+));
+
+app.post('/login',
+  passport.authenticate('local', { successRedirect: '/',
+                                   failureRedirect: '/login',
+                                   failureFlash: true })
+);
 
 app.get('/users/:id', function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -79,6 +106,44 @@ app.post('/users', function(req, res) {
         }
     });
 });
+
+var http = require("http"),
+    url = require("url"),
+    path = require("path"),
+    fs = require("fs")
+    port = config.get('port');
+ 
+/*http.createServer(function(request, response) {
+ 
+  var uri = url.parse(request.url).pathname
+    , filename = path.join(process.cwd(), uri);
+  
+  path.exists(filename, function(exists) {
+    if(!exists) {
+      response.writeHead(404, {"Content-Type": "text/plain"});
+      response.write("404 Not Found\n");
+      response.end();
+      return;
+    }
+ 
+    if (fs.statSync(filename).isDirectory()) filename += '/index.html';
+ 
+    fs.readFile(filename, "binary", function(err, file) {
+      if(err) {        
+        response.writeHead(500, {"Content-Type": "text/plain"});
+        response.write(err + "\n");
+        response.end();
+        return;
+      }
+ 
+      response.writeHead(200);
+      response.write(file, "binary");
+      response.end();
+    });
+  });
+}).listen(parseInt(port, 10)); */
+
+
 
 
 var server = app.listen(config.get('port'), function () {
