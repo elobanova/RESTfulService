@@ -1,6 +1,7 @@
 var express = require('express');
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
+var config = require('./libs/config');
 var app = express();
 
 app.use(morgan('dev'));
@@ -16,7 +17,7 @@ app.get('/sasha/:anyparam', function (req, res) {
   res.json(jsonResponse);
 })
 
-var server = app.listen(3000, function () {
+var server = app.listen(config.get('port'), function () {
   var host = server.address().address;
   var port = server.address().port;
 
