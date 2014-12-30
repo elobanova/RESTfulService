@@ -18,7 +18,7 @@ function requestFromServer() {
 		alert("I received the following object from the server: " + resp);
 	}
 
-	var customUrl = 'http://localhost:3000/sasha/',
+	var customUrl = 'http://localhost:3000/users/',
 	paramInput = document.getElementById("param_input");
 	req.open("GET", customUrl + paramInput.value, true);
 	req.send();

@@ -20,7 +20,7 @@ var Users = new Schema({
         required: true
     },
     email: { type: String, required: true },
-	password: { type: Stinrg, required: true}
+	password: { type: String, required: true}
 });
 
 var UsersModel = mongoose.model('Users', Users);
