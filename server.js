@@ -34,7 +34,52 @@ app.get('/users/:id', function (req, res) {
 		
 		return res.json(jsonResponse);
     });
-})
+});
+
+app.get('/users', function(req, res) {
+    return UsersModel.find(function (err, users) {
+        if (!err) {
+            return res.json(users);
+        } else {
+            res.statusCode = 500;
+            console.log('Internal error(%d): %s',res.statusCode,err.message);
+			var jsonResponse = new Object();
+			jsonResponse.error = 'Server error';
+            return res.json(jsonResponse);
+        }
+    });
+});
+
+app.post('/users', function(req, res) {
+    var user = new UsersModel({
+        role: req.body.role,
+        email: req.body.email,
+        password: req.body.password
+    });
+
+    user.save(function (err) {
+		var jsonResponse = new Object();
+        if (!err) {
+            console.log("user created");
+			jsonResponse.status = 'OK';
+			jsonResponse.user = user;
+            return res.json(jsonResponse);
+        } else {
+            console.log(err);
+            if(err.name == 'ValidationError') {
+                res.statusCode = 400;
+				jsonResponse.error = 'Validation error';
+                res.json(jsonResponse);
+            } else {
+                res.statusCode = 500;
+				jsonResponse.error = 'Server error';
+                res.json(jsonResponse);
+            }
+            console.log('Internal error(%d): %s', res.statusCode, err.message);
+        }
+    });
+});
+
 
 var server = app.listen(config.get('port'), function () {
   var host = server.address().address;
