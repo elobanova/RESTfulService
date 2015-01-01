@@ -1,0 +1,16 @@
+extends layout
+
+block content
+	div.container
+		div.row
+			h1.text-center.login-title Sign in to Class Room
+				div.account-wall
+					form(action='/login', method='POST')
+						input(type='text', name='username', placeholder='Email',required, autofocus)
+						input(type='password', name='password', placeholder='Password', required)
+						button(type='submit') Sign in
+						span.clearfix
+				a(href='/signup') Proceed to registration
+				#message
+				if message
+					h1.text-center.error-message #{message}
