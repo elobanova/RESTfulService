@@ -5,17 +5,18 @@ block content
 	div.col-sm-6.col-md-4.col-md-offset-4
 		h1 Sign in to Class Room
 		#message
-			if message
-				h1.text-center.error-message #{message}
-		div.account-wall
+			if message.length>0
+				div(class="alert alert-danger" role="alert")
+					span(class="glyphicon glyphicon-exclamation-sign" aria-hidden="true")
+					span.sr-only Error: #{message}
 		form(action='/login', method='POST')
-		div.form-group
-			label Username
-			input(type='text', name='username', class='form-control', placeholder='Username', required, autofocus)
-		div.form-group
-			label Password
-			input(type='password', name='password', class='form-control', placeholder='Password', required)
-		button(type='submit', class='btn btn-warning btn-lg') Sign in
-		span.clearfix
-		br
+			div.form-group
+				label Username
+				input(type='text', name='username', class='form-control', placeholder='Username', required, autofocus)
+			div.form-group
+				label Password
+				input(type='password', name='password', class='form-control', placeholder='Password', required)
+			button(type='submit', class='btn btn-warning btn-lg') Sign in
+			span.clearfix
+			br
 		a(href='/signup') Proceed to registration
