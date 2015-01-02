@@ -23,7 +23,7 @@ module.exports = function(passport){
                         newUser.username = username;
                         newUser.password = createHash(password);
                         newUser.email = req.param('email');
-                        newUser.role = 'student';//req.param('role');
+                        newUser.role = req.param('role');
 
                         newUser.save(function(err) {
                             if (err){

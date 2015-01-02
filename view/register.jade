@@ -18,6 +18,11 @@ block content
 			div.form-group
 				label Email
 				input(type='email', name='email', class='form-control', placeholder='Email',required)
+			div.form-group
+				label Occupation status
+				select(name='role', class='form-control', required)
+					option #{roles[0]}
+					option #{roles[1]}
 			span.clearfix
 			br
 			button(class='btn btn-warning btn-lg', type='submit') Register

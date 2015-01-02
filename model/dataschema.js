@@ -15,7 +15,7 @@ module.exports = mongoose.model('UsersModel',{
 	id: String,
     role: {
         type: String,
-        enum: ['professor', 'student'],
+        enum: config.get('roles'),
         required: true
     },
 	username: { type: String, required: true},

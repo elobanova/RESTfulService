@@ -1,5 +1,6 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express'),
+	config = require('../model/config');
+	router = express.Router();
 
 var isAuthenticated = function (req, res, next) {
 	if (req.isAuthenticated())
@@ -23,6 +24,7 @@ module.exports = function (passport) {
 	router.get('/signup', function(req, res) {
 		var jsonResponse = new Object();
 		jsonResponse.message = req.flash('message');
+		jsonResponse.roles = config.get('roles');
 		res.render('register', jsonResponse);
 	});
 
