@@ -7,8 +7,7 @@ block content
 		#message
 			if message.length>0
 				div(class="alert alert-danger" role="alert")
-					span(class="glyphicon glyphicon-exclamation-sign" aria-hidden="true")
-					span.sr-only Error: #{message}
+					span(class="glyphicon glyphicon-exclamation-sign" aria-hidden="true")   Error: #{message}
 		form(action='/login', method='POST')
 			div.form-group
 				label Username
