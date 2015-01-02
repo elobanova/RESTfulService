@@ -1,5 +1,5 @@
 var express = require('express'),
-	config = require('../model/config');
+	config = require('../model/config'),
 	router = express.Router();
 
 var isAuthenticated = function (req, res, next) {
