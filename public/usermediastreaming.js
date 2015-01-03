@@ -1,13 +1,13 @@
 var conferenceNameInput,
 	createNewConferenceButton,
 	extensionInstalled = false;
-	
+
 navigator.getUserMedia = navigator.webkitGetUserMedia || navigator.getUserMedia;
 
-window.onload = function() {
+window.onload = function () {
 	conferenceNameInput = document.getElementById('conference-name');
 	createNewConferenceButton = document.getElementById('start-conferencing');
-	
+
 	if (createNewConferenceButton) {
 		createNewConferenceButton.onclick = startConference;
 	}
@@ -16,33 +16,36 @@ window.onload = function() {
 function startConference() {
 	// send screen-sharer request to content-script
 	if (!extensionInstalled) {
-		var message = 	'Please install the extension:\n' +
-						'1. Go to chrome://extensions\n' +
-						'2. Check: "Enable Developer mode"\n' +
-						'3. Click: "Load the unpacked extension..."\n' +
-						'4. Choose "extension" folder from the repository\n' +
-						'5. Reload this page';
+		var message = 'Please install the extension:\n' +
+			'1. Go to chrome://extensions\n' +
+			'2. Check: "Enable Developer mode"\n' +
+			'3. Click: "Load the unpacked extension..."\n' +
+			'4. Choose "extension" folder from the repository\n' +
+			'5. Reload this page';
 		alert(message);
 	}
-	window.postMessage({ type: 'SS_UI_REQUEST', text: 'start' }, '*');
+	window.postMessage({
+		type : 'SS_UI_REQUEST',
+		text : 'start'
+	}, '*');
 	clearPage();
 }
 
 function clearPage() {
-    var groups = document.getElementsByClassName('form-group');
-    for (var i = 0; i < groups.length; i++) {
-        groups[i].style.display = 'none';
-    }
+	var groups = document.getElementsByClassName('form-group');
+	for (var i = 0; i < groups.length; i++) {
+		groups[i].style.display = 'none';
+	}
 	createNewConferenceButton.style.display = 'none';
 }
 
 function insertAfter(elem, refElem) {
-    return refElem.parentNode.insertBefore(elem, refElem.nextSibling);
+	return refElem.parentNode.insertBefore(elem, refElem.nextSibling);
 }
 
 function createVideoElement() {
 	var h1Element = document.getElementsByTagName("h1")[0],
-		videoElement = document.createElement('video');
+	videoElement = document.createElement('video');
 	videoElement.style.width = '640px';
 	videoElement.style.height = '480px';
 	videoElement.autoplay = true;
@@ -53,7 +56,8 @@ function createVideoElement() {
 
 // listen for messages from the content-script
 window.addEventListener('message', function (event) {
-	if (event.origin != window.location.origin) return;
+	if (event.origin != window.location.origin)
+		return;
 
 	// content-script will send a 'SS_PING' msg if extension is installed
 	if (event.data.type && (event.data.type === 'SS_PING')) {
@@ -72,24 +76,24 @@ window.addEventListener('message', function (event) {
 });
 
 function startScreenStreamFrom(streamId) {
-  navigator.webkitGetUserMedia({
-    audio: false,
-    video: {
-      mandatory: {
-        chromeMediaSource: 'desktop',
-        chromeMediaSourceId: streamId,
-        maxWidth: window.screen.width,
-        maxHeight: window.screen.height
-      }
-    }
-  },
-  function(screenStream) {
-	console.log('getUserMedia succeeded!');
-	var videoElement = createVideoElement();
-    videoElement.src = URL.createObjectURL(screenStream);
-    videoElement.play();
-  },
-  function(err) {
-    console.log('getUserMedia failed!: ' + err);
-  });
+	navigator.webkitGetUserMedia({
+		audio : false,
+		video : {
+			mandatory : {
+				chromeMediaSource : 'desktop',
+				chromeMediaSourceId : streamId,
+				maxWidth : window.screen.width,
+				maxHeight : window.screen.height
+			}
+		}
+	},
+		function (screenStream) {
+		console.log('getUserMedia succeeded!');
+		var videoElement = createVideoElement();
+		videoElement.src = URL.createObjectURL(screenStream);
+		videoElement.play();
+	},
+		function (err) {
+		console.log('getUserMedia failed!: ' + err);
+	});
 }
