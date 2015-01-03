@@ -42,10 +42,10 @@ var options = {
 };
 
 var server = https.createServer(options, app).listen(config.get('port'), function () {
-  var host = server.address().address;
-  var port = server.address().port;
+	var host = server.address().address;
+	var port = server.address().port;
 
-  console.log('Example app listening at http://%s:%s', host, port);
+	console.log('Example app listening at http://%s:%s', host, port);
 });
 
 module.exports = app;
