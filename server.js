@@ -10,7 +10,9 @@ var express = require('express'),
 	flash = require('connect-flash'),
 	initPassport = require('./authentication/init'),
 	routes = require('./routes/forwarding')(passport),
-	config = require('./model/config');
+	config = require('./model/config'),
+	https = require('https'),
+	fs = require('fs');
 
 app.set('views', path.join(__dirname, 'view'));
 app.set('view engine', 'jade');
@@ -34,7 +36,12 @@ app.use(function(req, res, next) {
     next(err);
 });
 
-var server = app.listen(config.get('port'), function () {
+var options = {
+    key: fs.readFileSync('./private.pem'),
+    cert: fs.readFileSync('./public.pem')
+};
+
+var server = https.createServer(options, app).listen(config.get('port'), function () {
   var host = server.address().address;
   var port = server.address().port;
 
