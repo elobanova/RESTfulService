@@ -37,6 +37,7 @@ module.exports = function (passport) {
 	router.get('/home', isAuthenticated, function(req, res) {
 		var jsonResponse = new Object();
 		jsonResponse.user = req.user;
+		jsonResponse.scripts = ['/usermediastreaming.js'];
 		res.render('home', jsonResponse);
 	});
 

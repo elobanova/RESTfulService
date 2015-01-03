@@ -25,6 +25,7 @@ app.use(passport.session());
 app.use(flash());
 initPassport(passport);
 app.use('/', routes);
+app.use(express.static(__dirname + '/public'));
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
