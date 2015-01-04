@@ -1,6 +1,8 @@
 var conferenceNameInput,
 	createNewConferenceButton,
-	extensionInstalled = false;
+	localStream,
+	extensionInstalled = false,
+	servers = null;
 
 navigator.getUserMedia = navigator.webkitGetUserMedia || navigator.getUserMedia;
 
@@ -49,6 +51,7 @@ function createVideoElement() {
 	videoElement.style.width = '640px';
 	videoElement.style.height = '480px';
 	videoElement.autoplay = true;
+	videoElement.controls = true;
 	videoElement.id = 'video';
 	insertAfter(videoElement, h1Element);
 	return videoElement;
@@ -89,6 +92,8 @@ function startScreenStreamFrom(streamId) {
 	},
 		function (screenStream) {
 		console.log('getUserMedia succeeded!');
+		localStream = screenStream;
+
 		var videoElement = createVideoElement();
 		videoElement.src = URL.createObjectURL(screenStream);
 		videoElement.play();
