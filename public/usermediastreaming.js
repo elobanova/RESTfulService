@@ -2,7 +2,14 @@ var conferenceNameInput,
 	createNewConferenceButton,
 	localStream,
 	extensionInstalled = false,
-	servers = null;
+	servers = null,
+	pc,
+	configuration = {
+		'iceServers' : [{
+				'url' : 'stun:stun.l.google.com:19302'
+			}
+		]
+	};
 
 navigator.getUserMedia = navigator.webkitGetUserMedia || navigator.getUserMedia;
 
@@ -30,6 +37,16 @@ function startConference() {
 		type : 'SS_UI_REQUEST',
 		text : 'start'
 	}, '*');
+
+	pc = new webkitRTCPeerConnection(configuration);
+
+	pc.onnegotiationneeded = function () {
+		pc.createOffer(localDescCreated, logError);
+	}
+
+	pc.onaddstream = function (event) {
+		remoteView.src = URL.createObjectURL(event.stream);
+	};
 	clearPage();
 }
 
