@@ -11,8 +11,14 @@ var express = require('express'),
 	initPassport = require('./authentication/init'),
 	routes = require('./routes/forwarding')(passport),
 	config = require('./model/config'),
+	fs = require('fs'),
+	options = {
+		key: fs.readFileSync('./private.pem'),
+		cert: fs.readFileSync('./public.pem')
+	};
 	https = require('https'),
-	fs = require('fs');
+	server = https.createServer(options, app),
+	io = require('socket.io').listen(server);
 
 app.set('views', path.join(__dirname, 'view'));
 app.set('view engine', 'jade');
@@ -36,12 +42,11 @@ app.use(function(req, res, next) {
     next(err);
 });
 
-var options = {
-    key: fs.readFileSync('./private.pem'),
-    cert: fs.readFileSync('./public.pem')
-};
+io.on('connection', function(socket) {
+	console.log('a user connected');
+});
 
-var server = https.createServer(options, app).listen(config.get('port'), function () {
+server.listen(config.get('port'), function () {
 	var host = server.address().address;
 	var port = server.address().port;
 
