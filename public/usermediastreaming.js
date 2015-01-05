@@ -1,9 +1,43 @@
 var conferenceNameInput,
 	createNewConferenceButton,
-	localStream,
-	extensionInstalled = false;
+	extensionInstalled = false,
+	iceServers = [],
+	socket,
+	eventsHandler = {
+		openSocket : function (jsonConfigurationObject) {
+			console.log('Opening socket ' + jsonConfigurationObject);
+		},
+	},
+	defaultSocket = {},
+	peerConfig = {
+		attachStream : eventsHandler.attachStream,
+		onICE : function (candidate) {
+			if (socket) {
+				socket.send({
+					candidate : {
+						sdpMLineIndex : candidate.sdpMLineIndex,
+						candidate : JSON.stringify(candidate.candidate)
+					}
+				});
+			}
+		},
+		onRemoteStream : function (screenStream) {
+			var videoElement = createVideoElement();
+			videoElement.src = URL.createObjectURL(screenStream);
+			videoElement.play();
+		}
+	};
 
 navigator.getUserMedia = navigator.webkitGetUserMedia || navigator.getUserMedia;
+
+// Google has this server as described in http://io13webrtc.appspot.com/#52
+iceServers.push({
+    url: 'stun:stun.l.google.com:19302'
+});
+
+iceServers = {
+    iceServers: iceServers
+};
 
 window.onload = function () {
 	conferenceNameInput = document.getElementById('conference-name');
@@ -12,6 +46,7 @@ window.onload = function () {
 	if (createNewConferenceButton) {
 		createNewConferenceButton.onclick = startConference;
 	}
+	openDefaultSocket();
 }
 
 function startConference() {
@@ -21,7 +56,7 @@ function startConference() {
 			'1. Go to chrome://extensions\n' +
 			'2. Check: "Enable Developer mode"\n' +
 			'3. Click: "Load the unpacked extension..."\n' +
-			'4. Choose "extension" folder from the repository\n' +
+			'4. Choose "extension" folder from https://github.com/elobanova/RESTfulService/tree/master/public\n' +
 			'5. Reload this page';
 		alert(message);
 	}
@@ -29,7 +64,7 @@ function startConference() {
 		type : 'SS_UI_REQUEST',
 		text : 'start'
 	}, '*');
-	var socket = io('https://localhost');
+	socket = io('https://localhost');
 	clearPage();
 }
 
@@ -45,14 +80,14 @@ function insertAfter(elem, refElem) {
 	return refElem.parentNode.insertBefore(elem, refElem.nextSibling);
 }
 
-function createVideoElement() {
+function createVideoElement(id) {
 	var h1Element = document.getElementsByTagName("h1")[0],
 	videoElement = document.createElement('video');
 	videoElement.style.width = '640px';
 	videoElement.style.height = '480px';
 	videoElement.autoplay = true;
 	videoElement.controls = true;
-	videoElement.id = 'video';
+	videoElement.id = id;
 	insertAfter(videoElement, h1Element);
 	return videoElement;
 }
@@ -92,13 +127,63 @@ function startScreenStreamFrom(streamId) {
 	},
 		function (screenStream) {
 		console.log('getUserMedia succeeded!');
-		localStream = screenStream;
+		eventsHandler.attachStream = screenStream;
 
-		var videoElement = createVideoElement();
+		var videoElement = createVideoElement('video');
 		videoElement.src = URL.createObjectURL(screenStream);
 		videoElement.play();
 	},
 		function (err) {
 		console.log('getUserMedia failed!: ' + err);
 	});
+}
+
+//We''ll pass the peerConfig here as parameter
+function createRTCPeerConnection(jsonArg) {
+	var pc;
+	try {
+		pc = new webkitRTCPeerConnection(iceServers);
+		pc.onicecandidate = onIceCandidate;
+		console.log("Created webkitRTCPeerConnection");
+	} catch (e) {
+		console.log("Error in webkitRTCPeerConnection, exception: " + e.message);
+		return;
+	}
+
+	pc.onconnecting = onSessionConnecting;
+	pc.onopen = onSessionOpened;
+	pc.onaddstream = function (event) {
+		var remoteMediaStream = event.stream;
+
+		remoteMediaStream.onended = function () {
+			console.log('Stream ended here');
+		};
+
+		if (jsonArg.onRemoteStream)
+			jsonArg.onRemoteStream(remoteMediaStream);
+	};
+	pc.onremovestream = onRemoteStreamRemoved;
+}
+
+function openSubSocket() {
+	var peer;
+	function initPeer(offerSDP) {
+		if (offerSDP) {
+			peerConfig.offerSDP = offerSDP;
+		}
+		peer = RTCPeerConnection(peerConfig);
+	}
+}
+
+function openDefaultSocket() {
+	defaultSocket = eventsHandler.openSocket({
+			onmessage : defaultSocketResponse,
+			callback : function (socket) {
+				defaultSocket = socket;
+			}
+		});
+}
+
+function defaultSocketResponse(response) {
+	openSubSocket();
 }
